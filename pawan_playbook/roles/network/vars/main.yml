@@ -1,0 +1,13 @@
+#---
+###> Globals
+#
+#eks_region: "{{ vpc_region }}"
+#eks_vpc_name: "{{ vpc_name }}"
+#eks_vpc_cidr_block: "{{ vpc_cidr_block }}"
+#eks_vpc_subnets:
+#    cidr: "{{ vpc_public_subnet_cidr }}"
+#    cidr: "{{ vpc_public_subnet_cidr }}"
+#    cidr: "{{ vpc_private_subnet_cidr }}"
+#    cidr: "{{ vpc_private_subnet_cidr }}"
+#
+#

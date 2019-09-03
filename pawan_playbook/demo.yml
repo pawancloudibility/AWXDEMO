@@ -1,0 +1,5 @@
+- hosts: localhost
+  connection: local
+  tasks: 
+      - name: printdemo
+        command: echo "Hello Test"

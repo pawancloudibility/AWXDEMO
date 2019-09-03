@@ -1,0 +1,36 @@
+---
+- name: create network for EKS
+  cloudformation:
+    stack_name: "{{ EKS_VPC_NAME }}-stack"
+    state: present
+    region: "{{ EKS_REGION }}"
+    aws_access_key: "{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
+    aws_secret_key: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
+    disable_rollback: true
+    template: "roles/network/templates/amazon-eks-vpc-private-subnets.yaml"
+    template_parameters:
+      VpcBlock: "{{ EKS_VPC_CIDR }}"
+      PublicSubnet01Block: "{{ EKS_VPC_PUBLIC_SUBNET_CIDR_A }}"
+      PublicSubnet02Block: "{{ EKS_VPC_PUBLIC_SUBNET_CIDR_B }}"
+      PrivateSubnet01Block: "{{ EKS_VPC_PRIVATE_SUBNET_CIDR_A }}"
+      PrivateSubnet02Block: "{{ EKS_VPC_PRIVATE_SUBNET_CIDR_B }}"
+      VpcName: "{{ EKS_VPC_NAME }}"
+    tags:
+      Stack: ansible-cloudformation-network
+  register: awx_network
+
+- name: Create a directory if it does not exist
+  file:
+    path: "/home/{{ EKS_VPC_NAME }}"
+    state: directory
+    mode: '0755'
+
+- name: retrive values from newly created EKS
+  local_action:
+    module: copy
+    content: "SecurityGroup - {{ item[0] }} \nSubnet - {{ item[1] }} \nVPC - {{ item[2] }} \n"
+    dest: "/home/{{ EKS_VPC_NAME }}/{{ EKS_VPC_NAME }}.txt"
+  with_nested:
+    - "{{ awx_network.stack_outputs.SecurityGroups }}"
+    - "{{ awx_network.stack_outputs.SubnetIds }}"
+    - "{{ awx_network.stack_outputs.VpcId }}"
